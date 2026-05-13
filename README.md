@@ -23,45 +23,81 @@ docker exec headscale headscale apikeys create --expiration 365d
 
 Copy the returned key.
 
-### 2. Create the `.env` file
+### 2. Clone the repository
+
+Clone into a subdirectory alongside your existing Headscale compose setup:
 
 ```bash
-cp .env.example .env
+git clone https://github.com/fredsimard/headscale-ui.git
 ```
+
+### 3. Create the `.env` file
+
+```bash
+cp headscale-ui/.env.example .env
+```
+
+> **Note:** Place the `.env` file in the same directory as your main `docker-compose.yml`, not inside the `headscale-ui` subfolder.
 
 Edit `.env` and fill in:
 
 | Variable | Description |
 |---|---|
-| `HEADSCALE_URL` | Internal URL of Headscale (e.g., `http://headscale:8080`) |
+| `HEADSCALE_URL` | Internal Docker URL of Headscale — check your `config.yaml` for `listen_addr` (e.g., `http://headscale:8443`) |
 | `HEADSCALE_API_KEY` | The API key from step 1 |
 | `ADMIN_USERNAME` | Login username (default: `admin`) |
 | `ADMIN_PASSWORD_HASH` | bcrypt hash of your password (see below) |
 | `SESSION_SECRET` | A long random string for session signing |
 
-### 3. Generate the password hash
+> **Important:** The default port is `8080` but your Headscale may be configured to listen on a different port (e.g., `8443`). Check the `listen_addr` value in your Headscale `config.yaml` to confirm.
+
+### 4. Generate the password hash
+
+Run this on any machine with Node.js installed:
 
 ```bash
-# Install dependencies first
 npm install
-
-# Generate the hash
 node hash-password.js 'your-secure-password'
 ```
 
 Paste the output into `ADMIN_PASSWORD_HASH` in your `.env` file.
 
-### 4. Configure Caddy (optional)
+### 5. Merge the docker-compose.yml
 
-Add the snippet from `Caddyfile.example` to your Caddy configuration, replacing the domain with yours.
+Add the `headscale-ui` service from `headscale-ui/docker-compose.yml` into your existing `docker-compose.yml`. Make sure to use `ports` (not `expose`) so the UI is accessible from the host:
 
-### 5. Deploy
+```yaml
+headscale-ui:
+  build:
+    context: ./headscale-ui
+    dockerfile: Dockerfile
+  container_name: headscale-ui
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    - NODE_ENV=production
+    - TRUST_PROXY=true
+  depends_on:
+    - headscale
+  ports:
+    - "3000:3000"
+```
+
+### 6. Configure reverse proxy (optional)
+
+**Caddy:** Add the snippet from `Caddyfile.example` to your Caddyfile, replacing the domain with yours.
+
+**Cloudflare Tunnel:** Point a public hostname to `http://localhost:3000`. No Caddy configuration needed for the UI in this case.
+
+### 7. Deploy
+
+From the directory containing your main `docker-compose.yml`:
 
 ```bash
 docker compose up -d --build
 ```
 
-The UI will be available on port 3000 internally (or through Caddy on your configured domain).
+The UI will be available on port 3000, or through your reverse proxy/tunnel on your configured domain.
 
 ## Development
 
@@ -76,12 +112,15 @@ The dev server uses `--watch` for auto-reload on file changes.
 
 ## Architecture
 
-```
-Browser → Caddy (TLS) → headscale-ui:3000 (Express/EJS)
-                                ↓
-                         headscale:8080 (API)
+```mermaid
+graph LR
+    Browser -->|HTTPS| CF[Cloudflare Tunnel / Caddy]
+    CF -->|HTTP :3000| UI[headscale-ui\nExpress/EJS]
+    UI -->|HTTP :8443| HS[headscale\nREST API]
 ```
 
-- The UI app makes server-side HTTP calls to the Headscale API
-- Authentication is handled by the UI app itself (separate from Headscale)
+- The UI runs as a separate Docker container — Headscale is unaware of its existence
+- All Headscale API calls are made server-side using the API key
+- Authentication is handled entirely by the UI app, independent of Headscale
 - Session data is stored in-memory (restarts clear sessions)
+- Both containers must be on the same Docker network for internal communication
