@@ -1,0 +1,8 @@
+# Example Caddyfile snippet — add this to your existing Caddyfile.
+#
+# Replace "headscale-ui.example.com" with your actual domain.
+# Caddy handles TLS automatically.
+
+headscale-ui.example.com {
+    reverse_proxy headscale-ui:3000
+}

@@ -1,0 +1,47 @@
+services:
+  headscale:
+    image: docker.io/headscale/headscale:0.28.0
+    container_name: headscale
+    ports:
+      - "0.0.0.0:8080:8080"
+      - "0.0.0.0:9090:9090"
+    volumes:
+      - /root/headscale/config:/etc/headscale
+      - /root/headscale/lib:/var/lib/headscale
+      - /root/headscale/run:/var/run/headscale
+    healthcheck:
+      test: ["CMD", "headscale", "health"]
+    command: serve
+    restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+  headscale-ui:
+    build: .
+    container_name: headscale-ui
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - TRUST_PROXY=true
+    depends_on:
+      - headscale
+    expose:
+      - "3000"
+
+volumes:
+  caddy_data:
+  caddy_config:

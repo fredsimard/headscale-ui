@@ -1,0 +1,35 @@
+body {
+  background-color: #f5f6fa;
+}
+
+.card {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.card-header {
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.table th {
+  white-space: nowrap;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+code {
+  font-size: 0.85em;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+.copy-btn {
+  text-decoration: none;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "headscale-ui",
+  "version": "1.0.0",
+  "description": "Web UI for managing a Headscale instance",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1"
+  }
+}

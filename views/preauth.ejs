@@ -1,0 +1,131 @@
+<%- include('partials/header') %>
+<%- include('partials/alerts') %>
+
+<h2 class="mb-3"><i class="bi bi-key me-2"></i>Pre-Auth Keys</h2>
+
+<div class="row g-4">
+  <!-- User selector & create form -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header bg-dark text-white">Select User</div>
+      <div class="card-body">
+        <form method="GET" action="/preauth">
+          <div class="input-group">
+            <select class="form-select" name="user" onchange="this.form.submit()">
+              <% users.forEach(u => { %>
+              <option value="<%= u.name %>" <%= u.name === selectedUser ? 'selected' : '' %>><%= u.name %></option>
+              <% }) %>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <% if (selectedUser) { %>
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">Create Pre-Auth Key</div>
+      <div class="card-body">
+        <form method="POST" action="/preauth/create">
+          <input type="hidden" name="user" value="<%= selectedUser %>">
+          <div class="mb-3">
+            <label for="expiryHours" class="form-label">Expiry (hours)</label>
+            <input type="number" class="form-control" id="expiryHours" name="expiry_hours"
+              value="24" min="1" max="8760" required>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="reusable" name="reusable">
+            <label class="form-check-label" for="reusable">Reusable</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="ephemeral" name="ephemeral">
+            <label class="form-check-label" for="ephemeral">Ephemeral</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Create Key</button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Keys list -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        Keys for <strong><%= selectedUser || '—' %></strong>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Reusable</th>
+              <th>Ephemeral</th>
+              <th>Used</th>
+              <th>Expiration</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (keys.length === 0) { %>
+            <tr><td colspan="6" class="text-center text-muted py-4">No pre-auth keys found.</td></tr>
+            <% } %>
+            <% keys.forEach(k => {
+              const expired = k.expiration && new Date(k.expiration) < new Date();
+              const used = k.used || false;
+            %>
+            <tr class="<%= expired ? 'table-secondary' : '' %>">
+              <td>
+                <code class="small user-select-all"><%= k.key ? k.key.substring(0, 20) + '...' : '—' %></code>
+                <% if (k.key) { %>
+                <button class="btn btn-sm btn-link p-0 ms-1 copy-btn" data-key="<%= k.key %>" title="Copy full key">
+                  <i class="bi bi-clipboard"></i>
+                </button>
+                <% } %>
+              </td>
+              <td><span class="badge bg-<%= k.reusable ? 'success' : 'secondary' %>"><%= k.reusable ? 'Yes' : 'No' %></span></td>
+              <td><span class="badge bg-<%= k.ephemeral ? 'info' : 'secondary' %>"><%= k.ephemeral ? 'Yes' : 'No' %></span></td>
+              <td><span class="badge bg-<%= used ? 'warning' : 'secondary' %>"><%= used ? 'Yes' : 'No' %></span></td>
+              <td class="small">
+                <% if (expired) { %>
+                <span class="text-danger"><%= new Date(k.expiration).toLocaleString() %> (expired)</span>
+                <% } else if (k.expiration) { %>
+                <%= new Date(k.expiration).toLocaleString() %>
+                <% } else { %>
+                —
+                <% } %>
+              </td>
+              <td>
+                <% if (!expired) { %>
+                <form method="POST" action="/preauth/expire" class="d-inline">
+                  <input type="hidden" name="user" value="<%= selectedUser %>">
+                  <input type="hidden" name="key" value="<%= k.key %>">
+                  <button type="submit" class="btn btn-outline-warning btn-sm" title="Expire key">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </form>
+                <% } else { %>
+                <span class="text-muted small">Expired</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.dataset.key).then(() => {
+        const icon = btn.querySelector('i');
+        icon.className = 'bi bi-check';
+        setTimeout(() => icon.className = 'bi bi-clipboard', 1500);
+      });
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>
