@@ -18,6 +18,8 @@ router.get('/', function(req, res) {
 
     users = users || [];
     var selectedUser = req.query.user || (users.length > 0 ? users[0].name : '');
+    var selectedUserObj = users.find(function(u) { return u.name === selectedUser; });
+    var selectedUserId = selectedUserObj ? selectedUserObj.id : '';
 
     if (!selectedUser) {
       return res.render('preauth', {
@@ -25,6 +27,7 @@ router.get('/', function(req, res) {
         users: users,
         keys: [],
         selectedUser: '',
+        selectedUserId: '',
         error: req.query.error || null,
         success: req.query.success || null,
       });
@@ -36,6 +39,7 @@ router.get('/', function(req, res) {
         users: users,
         keys: keys || [],
         selectedUser: selectedUser,
+        selectedUserId: selectedUserId,
         error: keyErr ? keyErr.message : (req.query.error || null),
         success: req.query.success || null,
       });
@@ -44,11 +48,12 @@ router.get('/', function(req, res) {
 });
 
 router.post('/create', function(req, res) {
-  var user = req.body.user;
+  var user   = req.body.user;    // name, used for redirect
+  var userId = req.body.userId;  // numeric ID, used for API
   var hours = parseInt(req.body.expiry_hours, 10) || 1;
   var expiration = new Date(Date.now() + hours * 3600 * 1000).toISOString();
 
-  api.createPreAuthKey(user, {
+  api.createPreAuthKey(userId, {
     reusable: req.body.reusable === 'on',
     ephemeral: req.body.ephemeral === 'on',
     expiration: expiration,

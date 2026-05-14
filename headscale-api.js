@@ -106,6 +106,10 @@ exports.deleteUser = function(id, callback) {
   apiRequest('DELETE', '/user/' + encodeURIComponent(id), null, callback);
 };
 
+exports.renameUser = function(id, newName, callback) {
+  apiRequest('POST', '/user/' + encodeURIComponent(id) + '/rename/' + encodeURIComponent(newName), null, callback);
+};
+
 // Pre-auth keys
 exports.listPreAuthKeys = function(user, callback) {
   apiRequest('GET', '/preauthkey?user=' + encodeURIComponent(user), null, function(err, data) {
@@ -114,9 +118,9 @@ exports.listPreAuthKeys = function(user, callback) {
   });
 };
 
-exports.createPreAuthKey = function(user, opts, callback) {
+exports.createPreAuthKey = function(userId, opts, callback) {
   var body = {
-    user: user,
+    user: userId,
     reusable: opts.reusable || false,
     ephemeral: opts.ephemeral || false,
     expiration: opts.expiration || new Date(Date.now() + 3600 * 1000).toISOString(),

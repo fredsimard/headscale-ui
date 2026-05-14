@@ -30,7 +30,8 @@
       <div class="card-header">Create key</div>
       <div class="card-body">
         <form method="POST" action="/preauth/create">
-          <input type="hidden" name="user" value="<%= selectedUser %>">
+          <input type="hidden" name="user"   value="<%= selectedUser %>">
+          <input type="hidden" name="userId" value="<%= selectedUserId %>">
           <div class="mb-4">
             <label for="expiryHours" class="form-label">Expiry (hours)</label>
             <input type="number" class="form-control" id="expiryHours" name="expiry_hours"

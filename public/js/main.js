@@ -66,6 +66,16 @@ if (deleteModal) {
   });
 }
 
+// Users — rename modal
+var renameUserModal = document.getElementById('renameUserModal');
+if (renameUserModal) {
+  renameUserModal.addEventListener('show.bs.modal', function(e) {
+    var btn = e.relatedTarget;
+    this.querySelector('#renameUserId').value        = btn.dataset.userId;
+    this.querySelector('#renameUserName').value      = btn.dataset.userName;
+  });
+}
+
 // Users — delete modal
 var deleteUserModal = document.getElementById('deleteUserModal');
 if (deleteUserModal) {
