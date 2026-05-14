@@ -143,16 +143,5 @@
   </div>
 </div>
 
-<script>
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(btn.dataset.key).then(() => {
-        const icon = btn.querySelector('i');
-        icon.className = 'bi bi-check';
-        setTimeout(() => icon.className = 'bi bi-clipboard', 1500);
-      });
-    });
-  });
-</script>
 
 <%- include('partials/footer') %>

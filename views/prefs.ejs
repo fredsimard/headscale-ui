@@ -66,18 +66,5 @@
   </div>
 </div>
 
-<script>
-  // Keep radio card selected state in sync visually
-  document.querySelectorAll('.pref-radio-card input').forEach(function(input) {
-    input.addEventListener('change', function() {
-      document.querySelectorAll('.pref-radio-card[class*="selected"]').forEach(function(card) {
-        if (card.querySelector('input').name === input.name) {
-          card.classList.remove('selected');
-        }
-      });
-      input.closest('.pref-radio-card').classList.add('selected');
-    });
-  });
-</script>
 
 <%- include('partials/footer') %>

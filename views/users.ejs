@@ -108,12 +108,5 @@
   </div>
 </div>
 
-<script>
-  document.getElementById('deleteUserModal').addEventListener('show.bs.modal', function(e) {
-    const btn = e.relatedTarget;
-    this.querySelector('#deleteUserId').value = btn.dataset.userId;
-    this.querySelector('#deleteUserLabel').textContent = btn.dataset.userName;
-  });
-</script>
 
 <%- include('partials/footer') %>
