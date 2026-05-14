@@ -529,6 +529,52 @@ code {
   color: #16a34a !important;
 }
 
+/* === Status filter pills === */
+.status-filter.active {
+  background-color: var(--primary) !important;
+  color: var(--on-dark) !important;
+  border-color: var(--primary) !important;
+}
+
+/* === Pref radio cards === */
+.pref-radio-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  cursor: pointer;
+  min-width: 120px;
+  transition: border-color 0.1s, background-color 0.1s;
+}
+
+.pref-radio-card input[type="radio"] {
+  display: none;
+}
+
+.pref-radio-card:hover {
+  border-color: var(--hairline-strong);
+  background-color: var(--surface-soft);
+}
+
+.pref-radio-card.selected {
+  border-color: var(--ink);
+  background-color: var(--canvas);
+}
+
+.pref-radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pref-radio-example {
+  font-size: 12px;
+  color: var(--mute);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 /* === Copy button (pre-auth keys) === */
 .copy-btn {
   background: none !important;

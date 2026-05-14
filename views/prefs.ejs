@@ -11,23 +11,73 @@
   <div class="card-header">Display</div>
   <div class="card-body">
     <form method="POST" action="/prefs">
-      <div class="mb-2">
+
+      <div class="mb-4">
         <label for="timezone" class="form-label">Time zone</label>
         <select class="form-select" id="timezone" name="timezone" style="border-radius: 12px !important">
-          <% allTimezones.forEach(function(tz) { %>
-          <option value="<%= tz %>" <%= tz === currentTz ? 'selected' : '' %>><%= tz %></option>
+          <% allTimezones.forEach(function(z) { %>
+          <option value="<%= z %>" <%= z === currentTz ? 'selected' : '' %>><%= z %></option>
           <% }) %>
         </select>
         <div class="form-text mt-2">
-          Dates and times in the UI are displayed using this zone.
-          Server default: <strong><%= serverTz %></strong>.
+          Server default: <strong><%= serverTz %></strong>
         </div>
       </div>
-      <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Save</button>
+
+      <div class="mb-4">
+        <div class="form-label mb-2">Time format</div>
+        <div class="d-flex gap-2">
+          <label class="pref-radio-card <%= timeFormat === '12h' ? 'selected' : '' %>">
+            <input type="radio" name="timeFormat" value="12h" <%= timeFormat === '12h' ? 'checked' : '' %>>
+            <span class="pref-radio-label">12-hour</span>
+            <span class="pref-radio-example">2:30 PM</span>
+          </label>
+          <label class="pref-radio-card <%= timeFormat === '24h' ? 'selected' : '' %>">
+            <input type="radio" name="timeFormat" value="24h" <%= timeFormat === '24h' ? 'checked' : '' %>>
+            <span class="pref-radio-label">24-hour</span>
+            <span class="pref-radio-example">14:30</span>
+          </label>
+        </div>
       </div>
+
+      <div class="mb-5">
+        <div class="form-label mb-2">Date format</div>
+        <div class="d-flex gap-2 flex-wrap">
+          <label class="pref-radio-card <%= dateFormat === 'long' ? 'selected' : '' %>">
+            <input type="radio" name="dateFormat" value="long" <%= dateFormat === 'long' ? 'checked' : '' %>>
+            <span class="pref-radio-label">Long</span>
+            <span class="pref-radio-example">May 13, 2026, 2:30:15 PM</span>
+          </label>
+          <label class="pref-radio-card <%= dateFormat === 'medium' ? 'selected' : '' %>">
+            <input type="radio" name="dateFormat" value="medium" <%= dateFormat === 'medium' ? 'checked' : '' %>>
+            <span class="pref-radio-label">Medium</span>
+            <span class="pref-radio-example">May 13, 2026, 2:30 PM</span>
+          </label>
+          <label class="pref-radio-card <%= dateFormat === 'short' ? 'selected' : '' %>">
+            <input type="radio" name="dateFormat" value="short" <%= dateFormat === 'short' ? 'checked' : '' %>>
+            <span class="pref-radio-label">Short</span>
+            <span class="pref-radio-example">5/13/26, 2:30 PM</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
     </form>
   </div>
 </div>
+
+<script>
+  // Keep radio card selected state in sync visually
+  document.querySelectorAll('.pref-radio-card input').forEach(function(input) {
+    input.addEventListener('change', function() {
+      document.querySelectorAll('.pref-radio-card[class*="selected"]').forEach(function(card) {
+        if (card.querySelector('input').name === input.name) {
+          card.classList.remove('selected');
+        }
+      });
+      input.closest('.pref-radio-card').classList.add('selected');
+    });
+  });
+</script>
 
 <%- include('partials/footer') %>

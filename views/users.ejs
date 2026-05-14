@@ -41,7 +41,7 @@
           <td style="color: var(--body-text)"><%= u.displayName || '—' %></td>
           <td style="color: var(--body-text)"><%= u.email || '—' %></td>
           <td style="font-size: 13px; color: var(--body-text)">
-            <%= u.createdAt ? new Date(u.createdAt).toLocaleString(undefined, { timeZone: tz }) : '—' %>
+            <%= u.createdAt ? new Date(u.createdAt).toLocaleString(undefined, dateOpts) : '—' %>
           </td>
           <td>
             <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"

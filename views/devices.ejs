@@ -5,9 +5,16 @@
   <h1 class="page-title">
     <i class="bi bi-pc-display"></i>Devices
   </h1>
-  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
-    <i class="bi bi-plus"></i>Register device
-  </button>
+  <div class="d-flex align-items-center gap-3">
+    <div class="d-flex gap-1">
+      <button class="btn btn-primary btn-sm status-filter active" data-filter="all">All</button>
+      <button class="btn btn-secondary btn-sm status-filter" data-filter="online">Online</button>
+      <button class="btn btn-secondary btn-sm status-filter" data-filter="offline">Offline</button>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+      <i class="bi bi-plus"></i>Register device
+    </button>
+  </div>
 </div>
 
 <div class="card">
@@ -42,13 +49,13 @@
         <%
           const online  = node.online || false;
           const expired = node.expiry && new Date(node.expiry) < new Date() && new Date(node.expiry).getFullYear() > 1970;
-          const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString(undefined, { timeZone: tz }) : '—';
+          const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString(undefined, dateOpts) : '—';
           const expiry   = node.expiry && new Date(node.expiry).getFullYear() > 1970
-            ? new Date(node.expiry).toLocaleString(undefined, { timeZone: tz }) : 'Never';
+            ? new Date(node.expiry).toLocaleString(undefined, dateOpts) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
         %>
-        <tr>
+        <tr data-status="<%= online ? 'online' : 'offline' %>">
           <td><code><%= node.id %></code></td>
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
@@ -203,6 +210,21 @@
     document.body.removeChild(ta);
     return Promise.resolve();
   }
+
+  document.querySelectorAll('.status-filter').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var filter = btn.dataset.filter;
+      document.querySelectorAll('.status-filter').forEach(function(b) {
+        b.classList.remove('active', 'btn-primary');
+        b.classList.add('btn-secondary');
+      });
+      btn.classList.add('active', 'btn-primary');
+      btn.classList.remove('btn-secondary');
+      document.querySelectorAll('tbody tr[data-status]').forEach(function(row) {
+        row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
+      });
+    });
+  });
 
   document.querySelectorAll('.ip-pill').forEach(function(pill) {
     pill.addEventListener('click', function() {

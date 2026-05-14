@@ -13,6 +13,12 @@ var prefsRoutes = require('./routes/prefs');
 
 var SERVER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+var DATE_STYLES = {
+  long:   { dateStyle: 'long',   timeStyle: 'medium' },
+  medium: { dateStyle: 'medium', timeStyle: 'short'  },
+  short:  { dateStyle: 'short',  timeStyle: 'short'  },
+};
+
 var app = express();
 var PORT = process.env.PORT || 3000;
 
@@ -54,9 +60,16 @@ if (process.env.TRUST_PROXY === 'true') {
 }
 
 app.use(function locals(req, res, next) {
-  res.locals.path = req.path;
-  res.locals.user = req.session.user || null;
-  res.locals.tz = (req.session.prefs && req.session.prefs.timezone) || SERVER_TZ;
+  var prefs = req.session.prefs || {};
+  var tz    = prefs.timezone || SERVER_TZ;
+  var style = DATE_STYLES[prefs.dateFormat] || DATE_STYLES.medium;
+  res.locals.path     = req.path;
+  res.locals.user     = req.session.user || null;
+  res.locals.tz       = tz;
+  res.locals.dateOpts = Object.assign({}, style, {
+    hour12:   prefs.timeFormat !== '24h',
+    timeZone: tz,
+  });
   next();
 });
 

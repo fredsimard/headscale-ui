@@ -114,9 +114,9 @@
               </td>
               <td style="font-size: 13px">
                 <% if (expired) { %>
-                <span style="color: #dc2626"><%= new Date(k.expiration).toLocaleString(undefined, { timeZone: tz }) %></span>
+                <span style="color: #dc2626"><%= new Date(k.expiration).toLocaleString(undefined, dateOpts) %></span>
                 <% } else if (k.expiration) { %>
-                <span style="color: var(--body-text)"><%= new Date(k.expiration).toLocaleString(undefined, { timeZone: tz }) %></span>
+                <span style="color: var(--body-text)"><%= new Date(k.expiration).toLocaleString(undefined, dateOpts) %></span>
                 <% } else { %>
                 <span style="color: var(--mute)">—</span>
                 <% } %>
