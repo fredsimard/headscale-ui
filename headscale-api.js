@@ -102,8 +102,8 @@ exports.createUser = function(name, callback) {
   apiRequest('POST', '/user', { name: name }, callback);
 };
 
-exports.deleteUser = function(name, callback) {
-  apiRequest('DELETE', '/user/' + encodeURIComponent(name), null, callback);
+exports.deleteUser = function(id, callback) {
+  apiRequest('DELETE', '/user/' + encodeURIComponent(id), null, callback);
 };
 
 // Pre-auth keys

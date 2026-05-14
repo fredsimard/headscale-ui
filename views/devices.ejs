@@ -42,9 +42,9 @@
         <%
           const online  = node.online || false;
           const expired = node.expiry && new Date(node.expiry) < new Date() && new Date(node.expiry).getFullYear() > 1970;
-          const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString() : '—';
+          const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString(undefined, { timeZone: tz }) : '—';
           const expiry   = node.expiry && new Date(node.expiry).getFullYear() > 1970
-            ? new Date(node.expiry).toLocaleString() : 'Never';
+            ? new Date(node.expiry).toLocaleString(undefined, { timeZone: tz }) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
         %>

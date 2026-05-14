@@ -9,6 +9,9 @@ var authRoutes = require('./routes/auth');
 var devicesRoutes = require('./routes/devices');
 var usersRoutes = require('./routes/users');
 var preauthRoutes = require('./routes/preauth');
+var prefsRoutes = require('./routes/prefs');
+
+var SERVER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -53,6 +56,7 @@ if (process.env.TRUST_PROXY === 'true') {
 app.use(function locals(req, res, next) {
   res.locals.path = req.path;
   res.locals.user = req.session.user || null;
+  res.locals.tz = (req.session.prefs && req.session.prefs.timezone) || SERVER_TZ;
   next();
 });
 
@@ -64,6 +68,7 @@ app.get('/', function(req, res) { res.redirect('/devices'); });
 app.use('/devices', devicesRoutes);
 app.use('/users', usersRoutes);
 app.use('/preauth', preauthRoutes);
+app.use('/prefs', prefsRoutes);
 
 app.use(function errorHandler(err, req, res, _next) {
   console.error('Unhandled error:', err);

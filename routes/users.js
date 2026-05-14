@@ -22,7 +22,7 @@ router.post('/create', function(req, res) {
 });
 
 router.post('/delete', function(req, res) {
-  api.deleteUser(req.body.name, function(err) {
+  api.deleteUser(req.body.id, function(err) {
     if (err) return res.redirect('/users?error=' + encodeURIComponent(err.message));
     res.redirect('/users?success=User deleted.');
   });

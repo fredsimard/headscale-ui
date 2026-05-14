@@ -41,11 +41,12 @@
           <td style="color: var(--body-text)"><%= u.displayName || '—' %></td>
           <td style="color: var(--body-text)"><%= u.email || '—' %></td>
           <td style="font-size: 13px; color: var(--body-text)">
-            <%= u.createdAt ? new Date(u.createdAt).toLocaleString() : '—' %>
+            <%= u.createdAt ? new Date(u.createdAt).toLocaleString(undefined, { timeZone: tz }) : '—' %>
           </td>
           <td>
             <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
               data-bs-target="#deleteUserModal"
+              data-user-id="<%= u.id %>"
               data-user-name="<%= u.name %>"
               title="Delete user">
               <i class="bi bi-trash"></i>
@@ -91,7 +92,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <input type="hidden" name="name" id="deleteUserName">
+        <input type="hidden" name="id" id="deleteUserId">
         <p style="color: var(--charcoal); margin-bottom: 8px">
           Delete user <strong id="deleteUserLabel" style="color: var(--ink)"></strong>?
         </p>
@@ -110,7 +111,7 @@
 <script>
   document.getElementById('deleteUserModal').addEventListener('show.bs.modal', function(e) {
     const btn = e.relatedTarget;
-    this.querySelector('#deleteUserName').value = btn.dataset.userName;
+    this.querySelector('#deleteUserId').value = btn.dataset.userId;
     this.querySelector('#deleteUserLabel').textContent = btn.dataset.userName;
   });
 </script>
