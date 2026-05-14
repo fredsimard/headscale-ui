@@ -30,6 +30,11 @@ body {
 
 /* === Navbar === */
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
   background-color: var(--canvas) !important;
   border-bottom: 1px solid var(--hairline);
   min-height: 56px;
@@ -421,7 +426,8 @@ tr.table-secondary td {
 .page-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 48px 32px;
+  /* top: clear fixed navbar (56px) + breathing room; bottom: clear fixed footer (~53px) + breathing room */
+  padding: 104px 32px 88px;
 }
 
 .page-header {
@@ -591,9 +597,14 @@ code {
 
 /* === Site footer === */
 .site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background-color: var(--canvas);
   border-top: 1px solid var(--hairline);
-  margin-top: 80px;
-  padding: 24px 32px;
+  padding: 16px 32px;
 }
 
 .site-footer-inner {
@@ -622,7 +633,7 @@ code {
 /* === Responsive === */
 @media (max-width: 768px) {
   .page-wrapper {
-    padding: 28px 16px;
+    padding: 88px 16px 80px;
   }
   .login-page {
     padding: 16px;
@@ -630,8 +641,7 @@ code {
     padding-top: 48px;
   }
   .site-footer {
-    padding: 20px 16px;
-    margin-top: 48px;
+    padding: 14px 16px;
   }
   .navbar {
     padding-left: 16px;
