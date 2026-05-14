@@ -1,60 +1,68 @@
 <%- include('partials/header') %>
 <%- include('partials/alerts') %>
 
-<h2 class="mb-3"><i class="bi bi-key me-2"></i>Pre-Auth Keys</h2>
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="bi bi-key"></i>Pre-Auth Keys
+  </h1>
+</div>
 
 <div class="row g-4">
-  <!-- User selector & create form -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm mb-3">
-      <div class="card-header bg-dark text-white">Select User</div>
+  <!-- Sidebar: user selector + create form -->
+  <div class="col-lg-3">
+    <div class="card mb-4">
+      <div class="card-header">User</div>
       <div class="card-body">
         <form method="GET" action="/preauth">
-          <div class="input-group">
-            <select class="form-select" name="user" onchange="this.form.submit()">
-              <% users.forEach(u => { %>
-              <option value="<%= u.name %>" <%= u.name === selectedUser ? 'selected' : '' %>><%= u.name %></option>
-              <% }) %>
-            </select>
-          </div>
+          <select class="form-select" name="user" onchange="this.form.submit()">
+            <% users.forEach(u => { %>
+            <option value="<%= u.name %>" <%= u.name === selectedUser ? 'selected' : '' %>>
+              <%= u.name %>
+            </option>
+            <% }) %>
+          </select>
         </form>
       </div>
     </div>
 
     <% if (selectedUser) { %>
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">Create Pre-Auth Key</div>
+    <div class="card">
+      <div class="card-header">Create key</div>
       <div class="card-body">
         <form method="POST" action="/preauth/create">
           <input type="hidden" name="user" value="<%= selectedUser %>">
-          <div class="mb-3">
+          <div class="mb-4">
             <label for="expiryHours" class="form-label">Expiry (hours)</label>
             <input type="number" class="form-control" id="expiryHours" name="expiry_hours"
               value="24" min="1" max="8760" required>
           </div>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="reusable" name="reusable">
-            <label class="form-check-label" for="reusable">Reusable</label>
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="reusable" name="reusable">
+              <label class="form-check-label" for="reusable" style="font-size: 14px">Reusable</label>
+            </div>
           </div>
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="ephemeral" name="ephemeral">
-            <label class="form-check-label" for="ephemeral">Ephemeral</label>
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="ephemeral" name="ephemeral">
+              <label class="form-check-label" for="ephemeral" style="font-size: 14px">Ephemeral</label>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Create Key</button>
+          <button type="submit" class="btn btn-primary w-100">Create key</button>
         </form>
       </div>
     </div>
     <% } %>
   </div>
 
-  <!-- Keys list -->
-  <div class="col-lg-8">
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
-        Keys for <strong><%= selectedUser || '—' %></strong>
+  <!-- Keys table -->
+  <div class="col-lg-9">
+    <div class="card">
+      <div class="card-header">
+        Keys for <%= selectedUser || '—' %>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-striped mb-0">
+        <table class="table table-hover mb-0">
           <thead>
             <tr>
               <th>Key</th>
@@ -62,12 +70,19 @@
               <th>Ephemeral</th>
               <th>Used</th>
               <th>Expiration</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             <% if (keys.length === 0) { %>
-            <tr><td colspan="6" class="text-center text-muted py-4">No pre-auth keys found.</td></tr>
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <i class="bi bi-key d-block mb-2" style="font-size: 24px;"></i>
+                  No pre-auth keys for this user.
+                </div>
+              </td>
+            </tr>
             <% } %>
             <% keys.forEach(k => {
               const expired = k.expiration && new Date(k.expiration) < new Date();
@@ -75,23 +90,35 @@
             %>
             <tr class="<%= expired ? 'table-secondary' : '' %>">
               <td>
-                <code class="small user-select-all"><%= k.key ? k.key.substring(0, 20) + '...' : '—' %></code>
+                <code class="user-select-all"><%= k.key ? k.key.substring(0, 22) + '…' : '—' %></code>
                 <% if (k.key) { %>
-                <button class="btn btn-sm btn-link p-0 ms-1 copy-btn" data-key="<%= k.key %>" title="Copy full key">
+                <button class="copy-btn btn-sm" data-key="<%= k.key %>" title="Copy full key">
                   <i class="bi bi-clipboard"></i>
                 </button>
                 <% } %>
               </td>
-              <td><span class="badge bg-<%= k.reusable ? 'success' : 'secondary' %>"><%= k.reusable ? 'Yes' : 'No' %></span></td>
-              <td><span class="badge bg-<%= k.ephemeral ? 'info' : 'secondary' %>"><%= k.ephemeral ? 'Yes' : 'No' %></span></td>
-              <td><span class="badge bg-<%= used ? 'warning' : 'secondary' %>"><%= used ? 'Yes' : 'No' %></span></td>
-              <td class="small">
+              <td>
+                <span class="badge bg-<%= k.reusable ? 'success' : 'secondary' %>">
+                  <%= k.reusable ? 'Yes' : 'No' %>
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-<%= k.ephemeral ? 'info' : 'secondary' %>">
+                  <%= k.ephemeral ? 'Yes' : 'No' %>
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-<%= used ? 'warning' : 'secondary' %>">
+                  <%= used ? 'Yes' : 'No' %>
+                </span>
+              </td>
+              <td style="font-size: 13px">
                 <% if (expired) { %>
-                <span class="text-danger"><%= new Date(k.expiration).toLocaleString() %> (expired)</span>
+                <span style="color: #dc2626"><%= new Date(k.expiration).toLocaleString() %></span>
                 <% } else if (k.expiration) { %>
-                <%= new Date(k.expiration).toLocaleString() %>
+                <span style="color: var(--body-text)"><%= new Date(k.expiration).toLocaleString() %></span>
                 <% } else { %>
-                —
+                <span style="color: var(--mute)">—</span>
                 <% } %>
               </td>
               <td>
@@ -104,7 +131,7 @@
                   </button>
                 </form>
                 <% } else { %>
-                <span class="text-muted small">Expired</span>
+                <span style="font-size: 12px; color: var(--mute)">Expired</span>
                 <% } %>
               </td>
             </tr>

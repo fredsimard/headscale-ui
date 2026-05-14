@@ -1,51 +1,59 @@
 <%- include('partials/header') %>
 <%- include('partials/alerts') %>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2><i class="bi bi-pc-display me-2"></i>Devices</h2>
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="bi bi-pc-display"></i>Devices
+  </h1>
   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
-    <i class="bi bi-plus-circle me-1"></i>Register Device
+    <i class="bi bi-plus"></i>Register device
   </button>
 </div>
 
-<div class="card shadow-sm">
+<div class="card">
   <div class="table-responsive">
-    <table class="table table-hover table-striped mb-0">
-      <thead class="table-dark">
+    <table class="table table-hover mb-0">
+      <thead>
         <tr>
           <th>ID</th>
           <th>Hostname</th>
-          <th>Name</th>
+          <th>Machine name</th>
           <th>User</th>
-          <th>IP Addresses</th>
+          <th>IP addresses</th>
           <th>Ephemeral</th>
-          <th>Last Seen</th>
+          <th>Last seen</th>
           <th>Expiry</th>
-          <th>Online</th>
-          <th>Actions</th>
+          <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <% if (nodes.length === 0) { %>
-        <tr><td colspan="10" class="text-center text-muted py-4">No devices found.</td></tr>
+        <tr>
+          <td colspan="10">
+            <div class="empty-state">
+              <i class="bi bi-pc-display d-block mb-2" style="font-size: 24px;"></i>
+              No devices registered yet.
+            </div>
+          </td>
+        </tr>
         <% } %>
         <% nodes.forEach(node => { %>
         <%
-          const online = node.online || false;
+          const online  = node.online || false;
           const expired = node.expiry && new Date(node.expiry) < new Date() && new Date(node.expiry).getFullYear() > 1970;
           const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString() : '—';
-          const expiry = node.expiry && new Date(node.expiry).getFullYear() > 1970
-            ? new Date(node.expiry).toLocaleString()
-            : 'Never';
-          const ips = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
+          const expiry   = node.expiry && new Date(node.expiry).getFullYear() > 1970
+            ? new Date(node.expiry).toLocaleString() : 'Never';
+          const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
         %>
         <tr>
           <td><code><%= node.id %></code></td>
-          <td><%= node.givenName || node.name || '—' %></td>
-          <td><small class="text-muted"><%= node.name || '—' %></small></td>
+          <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
+          <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
           <td><%= userName %></td>
-          <td><code class="small"><%= ips %></code></td>
+          <td><code><%= ips %></code></td>
           <td>
             <% if (node.ephemeral) { %>
             <span class="badge bg-info">Yes</span>
@@ -53,33 +61,35 @@
             <span class="badge bg-secondary">No</span>
             <% } %>
           </td>
-          <td class="small"><%= lastSeen %></td>
-          <td class="small">
+          <td style="font-size: 13px; color: var(--body-text)"><%= lastSeen %></td>
+          <td style="font-size: 13px">
             <% if (expired) { %>
-            <span class="text-danger"><%= expiry %></span>
+            <span style="color: #dc2626"><%= expiry %></span>
             <% } else { %>
-            <%= expiry %>
+            <span style="color: var(--body-text)"><%= expiry %></span>
             <% } %>
           </td>
           <td>
             <% if (online) { %>
             <span class="badge bg-success">Online</span>
             <% } else { %>
-            <span class="badge bg-danger">Offline</span>
+            <span class="badge bg-secondary">Offline</span>
             <% } %>
           </td>
           <td>
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-outline-primary" data-bs-toggle="modal"
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#renameModal"
                 data-node-id="<%= node.id %>"
-                data-node-name="<%= node.givenName || node.name || '' %>">
+                data-node-name="<%= node.givenName || node.name || '' %>"
+                title="Rename">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-outline-danger" data-bs-toggle="modal"
+              <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
                 data-bs-target="#deleteModal"
                 data-node-id="<%= node.id %>"
-                data-node-name="<%= node.givenName || node.name || '' %>">
+                data-node-name="<%= node.givenName || node.name || '' %>"
+                title="Delete">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
@@ -96,11 +106,11 @@
   <div class="modal-dialog">
     <form method="POST" action="/devices/register" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Register Device</h5>
+        <h5 class="modal-title">Register device</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <div class="mb-3">
+        <div class="mb-4">
           <label for="regUser" class="form-label">User</label>
           <select class="form-select" id="regUser" name="user" required>
             <% users.forEach(u => { %>
@@ -108,11 +118,11 @@
             <% }) %>
           </select>
         </div>
-        <div class="mb-3">
-          <label for="regKey" class="form-label">Node Key</label>
+        <div class="mb-2">
+          <label for="regKey" class="form-label">Node key</label>
           <input type="text" class="form-control" id="regKey" name="key"
-            placeholder="nodekey:abc123..." required>
-          <div class="form-text">The key generated on the device (starts with <code>nodekey:</code>).</div>
+            placeholder="nodekey:abc123…" required>
+          <div class="form-text mt-2">The key generated on the device (starts with <code>nodekey:</code>).</div>
         </div>
       </div>
       <div class="modal-footer">
@@ -128,13 +138,13 @@
   <div class="modal-dialog">
     <form method="POST" action="/devices/rename" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Rename Device</h5>
+        <h5 class="modal-title">Rename device</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <input type="hidden" name="nodeId" id="renameNodeId">
-        <div class="mb-3">
-          <label for="newName" class="form-label">New Name</label>
+        <div class="mb-2">
+          <label for="newName" class="form-label">New name</label>
           <input type="text" class="form-control" id="newName" name="newName" required>
         </div>
       </div>
@@ -151,13 +161,15 @@
   <div class="modal-dialog">
     <form method="POST" action="/devices/delete" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title text-danger">Delete Device</h5>
+        <h5 class="modal-title text-danger">Delete device</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <input type="hidden" name="nodeId" id="deleteNodeId">
-        <p>Are you sure you want to delete <strong id="deleteNodeName"></strong>?</p>
-        <p class="text-danger small">This action cannot be undone.</p>
+        <p style="color: var(--charcoal); margin-bottom: 8px">
+          Delete <strong id="deleteNodeName" style="color: var(--ink)"></strong>?
+        </p>
+        <p style="font-size: 13px; color: var(--mute); margin: 0">This action cannot be undone.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
