@@ -10,6 +10,7 @@ var devicesRoutes = require('./routes/devices');
 var usersRoutes = require('./routes/users');
 var preauthRoutes = require('./routes/preauth');
 var prefsRoutes = require('./routes/prefs');
+var api = require('./headscale-api');
 
 var SERVER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -45,6 +46,36 @@ function relativeDate(d) {
   if (years  >= 1) return p(years,  'year');
   if (months >= 1) return p(months, 'month');
   return p(weeks, 'week');
+}
+
+// Policy cache — refreshed periodically
+var policyCache = { hasPolicy: false, policyNames: [], lastFetch: 0 };
+var POLICY_TTL = 60000;  // re-check every 60s
+
+function refreshPolicy(callback) {
+  var now = Date.now();
+  if (now - policyCache.lastFetch < POLICY_TTL) return callback();
+  api.getPolicy(function(err, data) {
+    policyCache.lastFetch = now;
+    if (!data || !data.policy) {
+      policyCache.hasPolicy = false;
+      policyCache.policyNames = [];
+    } else {
+      var policyStr = typeof data.policy === 'string' ? data.policy : JSON.stringify(data.policy);
+      policyCache.hasPolicy = policyStr.trim().length > 0;
+      // Parse ACL names from the policy (Tailscale/Headscale HuJSON format)
+      policyCache.policyNames = [];
+      try {
+        var parsed = typeof data.policy === 'string' ? JSON.parse(data.policy) : data.policy;
+        if (parsed && parsed.acls && Array.isArray(parsed.acls)) {
+          parsed.acls.forEach(function(acl) {
+            if (acl.action) policyCache.policyNames.push(acl.action);
+          });
+        }
+      } catch(e) { /* ignore parse errors */ }
+    }
+    callback();
+  });
 }
 
 var app = express();
@@ -96,6 +127,7 @@ app.use(function locals(req, res, next) {
   res.locals.path = req.path;
   res.locals.user = req.session.user || null;
   res.locals.tz   = tz;
+  res.locals.headscaleFqdn = prefs.headscaleFqdn || '';
 
   res.locals.formatDate = function(val) {
     if (!val) return '—';
@@ -105,7 +137,11 @@ app.use(function locals(req, res, next) {
     return d.toLocaleString(undefined, opts);
   };
 
-  next();
+  // Refresh policy cache then continue
+  refreshPolicy(function() {
+    res.locals.hasPolicy = policyCache.hasPolicy;
+    next();
+  });
 });
 
 app.use('/', authRoutes);

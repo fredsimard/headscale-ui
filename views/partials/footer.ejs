@@ -2,6 +2,15 @@
 <footer class="site-footer">
   <div class="site-footer-inner">
     <span class="site-footer-text">Headscale UI</span>
+    <% if (typeof hasPolicy !== 'undefined') { %>
+    <span class="site-footer-text footer-policy-flag">
+      <% if (hasPolicy) { %>
+      <i class="bi bi-shield-check" style="color: #16a34a"></i> ACL policy active
+      <% } else { %>
+      <i class="bi bi-shield-slash" style="color: var(--mute)"></i> No ACL policy
+      <% } %>
+    </span>
+    <% } %>
     <span class="site-footer-text">Headscale v0.28.0</span>
   </div>
 </footer>

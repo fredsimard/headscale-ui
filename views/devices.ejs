@@ -17,15 +17,24 @@
   </div>
 </div>
 
+<div class="d-flex justify-content-center mb-4">
+  <div class="search-box-wrapper">
+    <i class="bi bi-search search-box-icon"></i>
+    <input type="text" class="form-control search-box" id="deviceSearch"
+      placeholder="Search devices…" data-table="devicesTable">
+  </div>
+</div>
+
 <div class="card">
   <div class="table-responsive">
-    <table class="table table-hover mb-0" data-sortable>
+    <table class="table table-hover mb-0" data-sortable id="devicesTable">
       <thead>
         <tr>
           <th>ID</th>
           <th>Hostname</th>
           <th>Machine name</th>
           <th>User</th>
+          <% if (hasPolicy) { %><th>Tags</th><% } %>
           <th>IP addresses</th>
           <th>Ephemeral</th>
           <th>Last seen</th>
@@ -37,7 +46,7 @@
       <tbody>
         <% if (nodes.length === 0) { %>
         <tr>
-          <td colspan="10">
+          <td colspan="<%= hasPolicy ? 11 : 10 %>">
             <div class="empty-state">
               <i class="bi bi-pc-display d-block mb-2" style="font-size: 24px;"></i>
               No devices registered yet.
@@ -54,12 +63,40 @@
             ? formatDate(node.expiry) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
+          const forcedTags  = node.forcedTags  || [];
+          const validTags   = node.validTags   || [];
+          const allTags     = forcedTags.concat(validTags);
+          const isTagged    = allTags.length > 0;
         %>
         <tr data-status="<%= online ? 'online' : 'offline' %>" class="<%= !online ? 'row-muted' : '' %>">
-          <td><code><%= node.id %></code></td>
+          <td>
+            <span class="d-inline-flex align-items-center gap-1">
+              <% if (hasPolicy) { %>
+                <% if (isTagged) { %>
+              <span class="owner-badge owner-badge-tagged" title="Tagged device">T</span>
+                <% } else { %>
+              <span class="owner-badge owner-badge-personal" title="Personal device">P</span>
+                <% } %>
+              <% } %>
+              <code><%= node.id %></code>
+            </span>
+          </td>
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
           <td><%= userName %></td>
+          <% if (hasPolicy) { %>
+          <td data-value="<%= allTags.join(' ') %>">
+            <% if (allTags.length > 0) { %>
+            <div class="tag-list">
+              <% allTags.forEach(function(tag) { %>
+              <span class="tag-pill"><%= tag.replace('tag:', '') %></span>
+              <% }) %>
+            </div>
+            <% } else { %>
+            <span style="color: var(--mute)">—</span>
+            <% } %>
+          </td>
+          <% } %>
           <td>
             <div class="ip-list">
               <% (node.ipAddresses || []).forEach(function(ip) { %>

@@ -7,10 +7,29 @@
   </h1>
 </div>
 
+<div class="card mb-4" style="max-width: 560px">
+  <div class="card-header">Headscale</div>
+  <div class="card-body">
+    <form method="POST" action="/prefs">
+      <div class="mb-4">
+        <label for="headscaleFqdn" class="form-label">Public URL</label>
+        <input type="url" class="form-control" id="headscaleFqdn" name="headscaleFqdn"
+          value="<%= headscaleFqdn %>"
+          placeholder="https://headscale.example.com">
+        <div class="form-text mt-2">
+          The public FQDN of your Headscale server, used for client configuration links.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+</div>
+
 <div class="card" style="max-width: 560px">
   <div class="card-header">Display</div>
   <div class="card-body">
     <form method="POST" action="/prefs">
+      <input type="hidden" name="headscaleFqdn" value="<%= headscaleFqdn %>">
 
       <div class="mb-4">
         <label for="timezone" class="form-label">Time zone</label>
