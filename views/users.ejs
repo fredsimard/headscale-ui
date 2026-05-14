@@ -12,7 +12,7 @@
 
 <div class="card">
   <div class="table-responsive">
-    <table class="table table-hover mb-0">
+    <table class="table table-hover mb-0" data-sortable>
       <thead>
         <tr>
           <th>ID</th>
@@ -40,8 +40,8 @@
           <td style="font-weight: 500; color: var(--ink)"><%= u.name %></td>
           <td style="color: var(--body-text)"><%= u.displayName || '—' %></td>
           <td style="color: var(--body-text)"><%= u.email || '—' %></td>
-          <td style="font-size: 13px; color: var(--body-text)">
-            <%= u.createdAt ? new Date(u.createdAt).toLocaleString(undefined, dateOpts) : '—' %>
+          <td style="font-size: 13px; color: var(--body-text)" data-value="<%= u.createdAt || '' %>">
+            <%= formatDate(u.createdAt) %>
           </td>
           <td>
             <div class="d-flex gap-2">

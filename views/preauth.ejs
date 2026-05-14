@@ -63,7 +63,7 @@
         Keys for <%= selectedUser || '—' %>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0" data-sortable>
           <thead>
             <tr>
               <th>Key</th>
@@ -89,7 +89,7 @@
               const expired = k.expiration && new Date(k.expiration) < new Date();
               const used = k.used || false;
             %>
-            <tr class="<%= expired ? 'table-secondary' : '' %>">
+            <tr class="<%= expired ? 'row-muted' : '' %>">
               <td>
                 <code class="user-select-all"><%= k.key ? k.key.substring(0, 22) + '…' : '—' %></code>
                 <% if (k.key) { %>
@@ -113,11 +113,11 @@
                   <%= used ? 'Yes' : 'No' %>
                 </span>
               </td>
-              <td style="font-size: 13px">
+              <td style="font-size: 13px" data-value="<%= k.expiration || '' %>">
                 <% if (expired) { %>
-                <span style="color: #dc2626"><%= new Date(k.expiration).toLocaleString(undefined, dateOpts) %></span>
+                <span style="color: #dc2626"><%= formatDate(k.expiration) %></span>
                 <% } else if (k.expiration) { %>
-                <span style="color: var(--body-text)"><%= new Date(k.expiration).toLocaleString(undefined, dateOpts) %></span>
+                <span style="color: var(--body-text)"><%= formatDate(k.expiration) %></span>
                 <% } else { %>
                 <span style="color: var(--mute)">—</span>
                 <% } %>

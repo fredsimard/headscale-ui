@@ -324,6 +324,29 @@ tr.table-secondary td {
   opacity: 0.45;
 }
 
+/* Muted rows — offline devices, expired keys */
+tr.row-muted td {
+  background-color: var(--surface-soft) !important;
+  color: var(--mute) !important;
+}
+tr.row-muted td * {
+  color: inherit !important;
+}
+tr.row-muted td code {
+  color: var(--mute) !important;
+}
+
+/* Sortable table headers */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+th.sortable:hover {
+  color: var(--charcoal);
+}
+th.sort-asc::after  { content: ' ▲'; font-size: 9px; opacity: 0.7; }
+th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 0.7; }
+
 /* === Badges === */
 .badge {
   font-size: 11px;

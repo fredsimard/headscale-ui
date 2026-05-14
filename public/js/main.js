@@ -97,6 +97,63 @@ document.querySelectorAll('.copy-btn').forEach(function(btn) {
   });
 });
 
+// Sortable tables — click any labelled <th> to sort asc/desc
+document.querySelectorAll('table[data-sortable]').forEach(function(table) {
+  var thead = table.querySelector('thead tr');
+  if (!thead) return;
+  var ths = Array.from(thead.querySelectorAll('th'));
+
+  ths.forEach(function(th, colIndex) {
+    if (!th.textContent.trim()) return; // skip action columns (no label)
+    th.classList.add('sortable');
+
+    th.addEventListener('click', function() {
+      var wasAsc = th.classList.contains('sort-asc');
+      var asc = !wasAsc;
+
+      // Reset all headers in this table
+      ths.forEach(function(other) {
+        other.classList.remove('sort-asc', 'sort-desc');
+      });
+      th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+
+      var tbody = table.querySelector('tbody');
+      var rows = Array.from(tbody.querySelectorAll('tr')).filter(function(r) {
+        // Skip empty-state rows (colspan cells)
+        return !r.querySelector('td[colspan]');
+      });
+
+      rows.sort(function(a, b) {
+        var cells = a.querySelectorAll('td');
+        var cellsB = b.querySelectorAll('td');
+        var cellA = cells[colIndex];
+        var cellB = cellsB[colIndex];
+        if (!cellA || !cellB) return 0;
+
+        // Use data-value when present (ISO dates, numeric IDs), else visible text
+        var valA = (cellA.dataset.value !== undefined && cellA.dataset.value !== '')
+          ? cellA.dataset.value : cellA.textContent.trim();
+        var valB = (cellB.dataset.value !== undefined && cellB.dataset.value !== '')
+          ? cellB.dataset.value : cellB.textContent.trim();
+
+        // Numeric comparison
+        var numA = Number(valA);
+        var numB = Number(valB);
+        if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') {
+          return asc ? numA - numB : numB - numA;
+        }
+
+        // Lexicographic (works for ISO date strings too)
+        if (valA < valB) return asc ? -1 : 1;
+        if (valA > valB) return asc ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(function(row) { tbody.appendChild(row); });
+    });
+  });
+});
+
 // Preferences — radio card visual selection
 document.querySelectorAll('.pref-radio-card input[type="radio"]').forEach(function(input) {
   input.addEventListener('change', function() {

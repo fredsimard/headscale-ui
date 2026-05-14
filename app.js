@@ -19,6 +19,34 @@ var DATE_STYLES = {
   short:  { dateStyle: 'short',  timeStyle: 'short'  },
 };
 
+function relativeDate(d) {
+  var diff     = Date.now() - d.getTime();
+  var secs     = Math.floor(diff / 1000);
+  var mins     = Math.floor(secs / 60);
+  var hours    = Math.floor(mins / 60);
+  var days     = Math.floor(hours / 24);
+  var weeks    = Math.floor(days / 7);
+  var months   = Math.floor(days / 30.44);
+  var years    = Math.floor(days / 365.25);
+
+  function p(n, w) { return n + ' ' + w + (n === 1 ? '' : 's') + ' ago'; }
+
+  if (mins  < 1)  return 'just now';
+  if (hours < 1)  return p(mins, 'minute');
+  if (days  < 1)  {
+    var remMins = mins % 60;
+    return remMins > 0 ? p(hours, 'hour') + ' and ' + p(remMins, 'minute') : p(hours, 'hour');
+  }
+  if (days  < 7)  {
+    var remHours = hours % 24;
+    return remHours > 0 ? p(days, 'day') + ' and ' + p(remHours, 'hour') : p(days, 'day');
+  }
+  // ≥ 1 week — no time detail
+  if (years  >= 1) return p(years,  'year');
+  if (months >= 1) return p(months, 'month');
+  return p(weeks, 'week');
+}
+
 var app = express();
 var PORT = process.env.PORT || 3000;
 
@@ -63,13 +91,20 @@ app.use(function locals(req, res, next) {
   var prefs = req.session.prefs || {};
   var tz    = prefs.timezone || SERVER_TZ;
   var style = DATE_STYLES[prefs.dateFormat] || DATE_STYLES.medium;
-  res.locals.path     = req.path;
-  res.locals.user     = req.session.user || null;
-  res.locals.tz       = tz;
-  res.locals.dateOpts = Object.assign({}, style, {
-    hour12:   prefs.timeFormat !== '24h',
-    timeZone: tz,
-  });
+  var opts  = Object.assign({}, style, { hour12: prefs.timeFormat !== '24h', timeZone: tz });
+
+  res.locals.path = req.path;
+  res.locals.user = req.session.user || null;
+  res.locals.tz   = tz;
+
+  res.locals.formatDate = function(val) {
+    if (!val) return '—';
+    var d = new Date(val);
+    if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return '—';
+    if (prefs.dateFormat === 'relative') return relativeDate(d);
+    return d.toLocaleString(undefined, opts);
+  };
+
   next();
 });
 

@@ -4,7 +4,7 @@ var router = express.Router();
 var SERVER_TZ   = Intl.DateTimeFormat().resolvedOptions().timeZone;
 var ALL_TZ      = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [SERVER_TZ];
 var TIME_FORMATS = ['12h', '24h'];
-var DATE_FORMATS = ['long', 'medium', 'short'];
+var DATE_FORMATS = ['long', 'medium', 'short', 'relative'];
 
 router.get('/', function(req, res) {
   var prefs = req.session.prefs || {};

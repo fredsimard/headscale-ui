@@ -19,7 +19,7 @@
 
 <div class="card">
   <div class="table-responsive">
-    <table class="table table-hover mb-0">
+    <table class="table table-hover mb-0" data-sortable>
       <thead>
         <tr>
           <th>ID</th>
@@ -49,13 +49,13 @@
         <%
           const online  = node.online || false;
           const expired = node.expiry && new Date(node.expiry) < new Date() && new Date(node.expiry).getFullYear() > 1970;
-          const lastSeen = node.lastSeen ? new Date(node.lastSeen).toLocaleString(undefined, dateOpts) : '—';
+          const lastSeen = formatDate(node.lastSeen);
           const expiry   = node.expiry && new Date(node.expiry).getFullYear() > 1970
-            ? new Date(node.expiry).toLocaleString(undefined, dateOpts) : 'Never';
+            ? formatDate(node.expiry) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
         %>
-        <tr data-status="<%= online ? 'online' : 'offline' %>">
+        <tr data-status="<%= online ? 'online' : 'offline' %>" class="<%= !online ? 'row-muted' : '' %>">
           <td><code><%= node.id %></code></td>
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
@@ -77,8 +77,8 @@
             <span class="badge bg-secondary">No</span>
             <% } %>
           </td>
-          <td style="font-size: 13px; color: var(--body-text)"><%= lastSeen %></td>
-          <td style="font-size: 13px">
+          <td style="font-size: 13px; color: var(--body-text)" data-value="<%= node.lastSeen || '' %>"><%= lastSeen %></td>
+          <td style="font-size: 13px" data-value="<%= node.expiry || '' %>">
             <% if (expired) { %>
             <span style="color: #dc2626"><%= expiry %></span>
             <% } else { %>

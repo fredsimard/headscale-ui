@@ -58,6 +58,11 @@
             <span class="pref-radio-label">Short</span>
             <span class="pref-radio-example">5/13/26, 2:30 PM</span>
           </label>
+          <label class="pref-radio-card <%= dateFormat === 'relative' ? 'selected' : '' %>">
+            <input type="radio" name="dateFormat" value="relative" <%= dateFormat === 'relative' ? 'checked' : '' %>>
+            <span class="pref-radio-label">Relative</span>
+            <span class="pref-radio-example">2 days and 3 hours ago</span>
+          </label>
         </div>
       </div>
 
