@@ -56,12 +56,7 @@
           <td>
             <div class="ip-list">
               <% (node.ipAddresses || []).forEach(function(ip) { %>
-              <span class="ip-pill">
-                <code class="ip-pill-text"><%= ip %></code>
-                <button class="ip-copy-btn" data-ip="<%= ip %>" title="Copy">
-                  <i class="bi bi-clipboard"></i>
-                </button>
-              </span>
+              <button class="ip-pill" data-ip="<%= ip %>" title="Copy <%= ip %>"><%= ip %></button>
               <% }) %>
               <% if (!node.ipAddresses || node.ipAddresses.length === 0) { %>
               <span style="color: var(--mute)">—</span>
@@ -194,12 +189,31 @@
 </div>
 
 <script>
-  document.querySelectorAll('.ip-copy-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      navigator.clipboard.writeText(btn.dataset.ip).then(function() {
-        const icon = btn.querySelector('i');
-        icon.className = 'bi bi-check';
-        setTimeout(function() { icon.className = 'bi bi-clipboard'; }, 1500);
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  document.querySelectorAll('.ip-pill').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      copyText(pill.dataset.ip).then(function() {
+        var original = pill.textContent;
+        pill.textContent = 'Copied!';
+        pill.classList.add('ip-pill-copied');
+        setTimeout(function() {
+          pill.textContent = original;
+          pill.classList.remove('ip-pill-copied');
+        }, 1500);
       });
     });
   });
