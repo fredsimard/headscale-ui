@@ -53,7 +53,21 @@
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
           <td><%= userName %></td>
-          <td><code><%= ips %></code></td>
+          <td>
+            <div class="ip-list">
+              <% (node.ipAddresses || []).forEach(function(ip) { %>
+              <span class="ip-pill">
+                <code class="ip-pill-text"><%= ip %></code>
+                <button class="ip-copy-btn" data-ip="<%= ip %>" title="Copy">
+                  <i class="bi bi-clipboard"></i>
+                </button>
+              </span>
+              <% }) %>
+              <% if (!node.ipAddresses || node.ipAddresses.length === 0) { %>
+              <span style="color: var(--mute)">—</span>
+              <% } %>
+            </div>
+          </td>
           <td>
             <% if (node.ephemeral) { %>
             <span class="badge bg-info">Yes</span>
@@ -180,6 +194,16 @@
 </div>
 
 <script>
+  document.querySelectorAll('.ip-copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(btn.dataset.ip).then(function() {
+        const icon = btn.querySelector('i');
+        icon.className = 'bi bi-check';
+        setTimeout(function() { icon.className = 'bi bi-clipboard'; }, 1500);
+      });
+    });
+  });
+
   document.getElementById('renameModal').addEventListener('show.bs.modal', function(e) {
     const btn = e.relatedTarget;
     this.querySelector('#renameNodeId').value = btn.dataset.nodeId;
