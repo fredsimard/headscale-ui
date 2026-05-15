@@ -122,6 +122,18 @@ if (deleteUserModal) {
   });
 }
 
+// Pre-auth create form — sync hidden userId field when user select changes
+var createKeyUser = document.getElementById('createKeyUser');
+if (createKeyUser) {
+  function syncCreateKeyUserId() {
+    var opt = createKeyUser.options[createKeyUser.selectedIndex];
+    var userIdInput = document.getElementById('createKeyUserId');
+    if (userIdInput && opt) userIdInput.value = opt.dataset.id || '';
+  }
+  createKeyUser.addEventListener('change', syncCreateKeyUserId);
+  syncCreateKeyUserId(); // sync on page load
+}
+
 // Pre-auth keys — copy key button
 document.querySelectorAll('.copy-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {

@@ -8,30 +8,24 @@
 </div>
 
 <div class="row g-4">
-  <!-- Sidebar: user selector + create form -->
+  <!-- Sidebar: create form -->
   <div class="col-lg-3">
-    <div class="card mb-4">
-      <div class="card-header">User</div>
-      <div class="card-body">
-        <form method="GET" action="/preauth">
-          <select class="form-select" name="user" onchange="this.form.submit()">
-            <% users.forEach(u => { %>
-            <option value="<%= u.name %>" <%= u.name === selectedUser ? 'selected' : '' %>>
-              <%= u.name %>
-            </option>
-            <% }) %>
-          </select>
-        </form>
-      </div>
-    </div>
-
-    <% if (selectedUser) { %>
     <div class="card">
       <div class="card-header">Create key</div>
       <div class="card-body">
         <form method="POST" action="/preauth/create">
-          <input type="hidden" name="user"   value="<%= selectedUser %>">
-          <input type="hidden" name="userId" value="<%= selectedUserId %>">
+          <div class="mb-4">
+            <label for="createKeyUser" class="form-label">User</label>
+            <select class="form-select" name="user" id="createKeyUser">
+              <% users.forEach(u => { %>
+              <option value="<%= u.name %>" data-id="<%= u.id %>"
+                <%= u.name === defaultUser ? 'selected' : '' %>>
+                <%= u.name %>
+              </option>
+              <% }) %>
+            </select>
+            <input type="hidden" name="userId" id="createKeyUserId" value="<%= defaultUserId %>">
+          </div>
           <div class="mb-4">
             <label for="expiryHours" class="form-label">Expiry (hours)</label>
             <input type="number" class="form-control" id="expiryHours" name="expiry_hours"
@@ -53,19 +47,17 @@
         </form>
       </div>
     </div>
-    <% } %>
   </div>
 
-  <!-- Keys table -->
+  <!-- Keys table — all users -->
   <div class="col-lg-9">
     <div class="card">
-      <div class="card-header">
-        Keys for <%= selectedUser || '—' %>
-      </div>
+      <div class="card-header">All pre-auth keys</div>
       <div class="table-responsive">
         <table class="table table-hover mb-0" data-sortable>
           <thead>
             <tr>
+              <th>User</th>
               <th>Key</th>
               <th>Reusable</th>
               <th>Ephemeral</th>
@@ -77,10 +69,10 @@
           <tbody>
             <% if (keys.length === 0) { %>
             <tr>
-              <td colspan="6">
+              <td colspan="7">
                 <div class="empty-state">
                   <i class="bi bi-key d-block mb-2" style="font-size: 24px;"></i>
-                  No pre-auth keys for this user.
+                  No pre-auth keys found.
                 </div>
               </td>
             </tr>
@@ -90,6 +82,7 @@
               const used = k.used || false;
             %>
             <tr class="<%= expired ? 'row-muted' : '' %>">
+              <td style="font-weight: 500; color: var(--ink)"><%= k.userName || '—' %></td>
               <td>
                 <code class="user-select-all"><%= k.key ? k.key.substring(0, 22) + '…' : '—' %></code>
                 <% if (k.key) { %>
@@ -125,8 +118,8 @@
               <td>
                 <% if (!expired) { %>
                 <form method="POST" action="/preauth/expire" class="d-inline">
-                  <input type="hidden" name="user" value="<%= selectedUser %>">
-                  <input type="hidden" name="key" value="<%= k.key %>">
+                  <input type="hidden" name="user" value="<%= k.userName %>">
+                  <input type="hidden" name="key"  value="<%= k.key %>">
                   <button type="submit" class="btn btn-outline-warning btn-sm" title="Expire key">
                     <i class="bi bi-x-circle"></i>
                   </button>
