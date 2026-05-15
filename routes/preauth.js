@@ -36,32 +36,30 @@ router.get('/', function(req, res) {
       });
     }
 
-    // Fetch keys for all users in parallel, tag each key with its owner
-    var allKeys = [];
-    var pending = users.length;
-
-    users.forEach(function(u) {
-      api.listPreAuthKeys(u.name, function(keyErr, keys) {
-        if (!keyErr && keys) {
-          keys.forEach(function(k) {
-            allKeys.push(Object.assign({}, k, { userName: u.name, userId: u.id }));
-          });
-        }
-        if (--pending === 0) {
-          // Sort newest expiration first
-          allKeys.sort(function(a, b) {
-            return new Date(b.expiration || 0) - new Date(a.expiration || 0);
-          });
-          res.render('preauth', {
-            title: 'Pre-Auth Keys',
-            users: users,
-            keys: allKeys,
-            defaultUser: defaultUser,
-            defaultUserId: defaultUserId,
-            error: req.query.error || null,
-            success: req.query.success || null,
-          });
-        }
+    // Fetch all keys in a single call — the API ignores ?user= and returns
+    // everything anyway; each key has an embedded user object we can read.
+    api.listAllPreAuthKeys(function(keyErr, keys) {
+      var allKeys = [];
+      if (!keyErr && keys) {
+        keys.forEach(function(k) {
+          // Headscale embeds the user object on each key
+          var userName = (k.user && (k.user.name || k.user.displayName)) || '';
+          var userId   = (k.user && k.user.id) || '';
+          allKeys.push(Object.assign({}, k, { userName: userName, userId: userId }));
+        });
+      }
+      // Sort newest expiration first
+      allKeys.sort(function(a, b) {
+        return new Date(b.expiration || 0) - new Date(a.expiration || 0);
+      });
+      res.render('preauth', {
+        title: 'Pre-Auth Keys',
+        users: users,
+        keys: allKeys,
+        defaultUser: defaultUser,
+        defaultUserId: defaultUserId,
+        error: keyErr ? keyErr.message : (req.query.error || null),
+        success: req.query.success || null,
       });
     });
   });

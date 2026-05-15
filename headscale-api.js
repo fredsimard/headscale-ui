@@ -118,6 +118,13 @@ exports.listPreAuthKeys = function(user, callback) {
   });
 };
 
+exports.listAllPreAuthKeys = function(callback) {
+  apiRequest('GET', '/preauthkey', null, function(err, data) {
+    if (err) return callback(err);
+    callback(null, (data && data.preAuthKeys) || []);
+  });
+};
+
 exports.createPreAuthKey = function(userId, opts, callback) {
   var body = {
     user: userId,
