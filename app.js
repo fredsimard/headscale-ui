@@ -5,6 +5,7 @@ var session = require('express-session');
 var path = require('path');
 
 var api = require('./headscale-api');
+var prefsStore = require('./prefs-store');
 var authMiddleware = require('./middleware/auth');
 var authRoutes = require('./routes/auth');
 var devicesRoutes = require('./routes/devices');
@@ -12,7 +13,7 @@ var usersRoutes = require('./routes/users');
 var preauthRoutes = require('./routes/preauth');
 var prefsRoutes = require('./routes/prefs');
 
-var SERVER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var SERVER_TZ = 'America/Toronto';
 
 var DATE_STYLES = {
   long:   { dateStyle: 'long',   timeStyle: 'medium' },
@@ -89,7 +90,7 @@ if (process.env.TRUST_PROXY === 'true') {
 }
 
 app.use(function locals(req, res, next) {
-  var prefs = req.session.prefs || {};
+  var prefs = prefsStore.getAll();
   var tz    = prefs.timezone || SERVER_TZ;
   var style = DATE_STYLES[prefs.dateFormat] || DATE_STYLES.medium;
   var opts  = Object.assign({}, style, { hour12: prefs.timeFormat !== '24h', timeZone: tz });

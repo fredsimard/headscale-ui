@@ -1,13 +1,15 @@
 var express = require('express');
+var prefsStore = require('../prefs-store');
+
 var router = express.Router();
 
-var SERVER_TZ   = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var SERVER_TZ   = 'America/Toronto';
 var ALL_TZ      = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [SERVER_TZ];
 var TIME_FORMATS = ['12h', '24h'];
 var DATE_FORMATS = ['long', 'medium', 'short', 'relative'];
 
 router.get('/', function(req, res) {
-  var prefs = req.session.prefs || {};
+  var prefs = prefsStore.getAll();
   res.render('prefs', {
     title:          'Preferences',
     serverTz:       SERVER_TZ,
@@ -22,28 +24,24 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-  var prefs = Object.assign({}, req.session.prefs || {});
+  var updates = {};
   var tz = req.body.timezone;
-  if (tz && ALL_TZ.includes(tz))                    prefs.timezone   = tz;
-  if (TIME_FORMATS.includes(req.body.timeFormat))   prefs.timeFormat = req.body.timeFormat;
-  if (DATE_FORMATS.includes(req.body.dateFormat))   prefs.dateFormat = req.body.dateFormat;
+  if (tz && ALL_TZ.includes(tz))                    updates.timezone   = tz;
+  if (TIME_FORMATS.includes(req.body.timeFormat))   updates.timeFormat = req.body.timeFormat;
+  if (DATE_FORMATS.includes(req.body.dateFormat))   updates.dateFormat = req.body.dateFormat;
   var fqdn = (req.body.headscaleFqdn || '').trim();
-  prefs.headscaleFqdn = fqdn;
-  req.session.prefs = prefs;  // top-level assignment so express-session detects the change
-  req.session.save(function() {
-    res.redirect('/prefs?success=' + encodeURIComponent('Preferences saved.'));
-  });
+  updates.headscaleFqdn = fqdn;
+  prefsStore.merge(updates);
+  res.redirect('/prefs?success=' + encodeURIComponent('Preferences saved.'));
 });
 
 // AJAX theme toggle — called by the dark mode button without a page reload
 router.post('/theme', function(req, res) {
-  var prefs = Object.assign({}, req.session.prefs || {});
   var theme = req.body.theme;
-  if (theme === 'dark' || theme === 'light') prefs.theme = theme;
-  req.session.prefs = prefs;  // top-level assignment so express-session detects the change
-  req.session.save(function() {
-    res.json({ ok: true, theme: prefs.theme });
-  });
+  if (theme === 'dark' || theme === 'light') {
+    prefsStore.set('theme', theme);
+  }
+  res.json({ ok: true, theme: prefsStore.get('theme') });
 });
 
 module.exports = router;

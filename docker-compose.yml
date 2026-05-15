@@ -37,6 +37,8 @@ services:
     environment:
       - NODE_ENV=production
       - TRUST_PROXY=true
+    volumes:
+      - headscale_ui_data:/app/data
     depends_on:
       - headscale
     expose:
@@ -45,3 +47,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  headscale_ui_data:

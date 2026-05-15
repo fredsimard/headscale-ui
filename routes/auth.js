@@ -54,24 +54,18 @@ router.post('/login', loginLimiter, function(req, res) {
       return res.render('login', { title: 'Login', error: 'Invalid credentials.' });
     }
 
-    var savedPrefs = req.session.prefs;  // keep prefs across session regeneration
     req.session.regenerate(function(err) {
       if (err) {
         return res.render('login', { title: 'Login', error: 'Session error.' });
       }
-      req.session.user  = { username: adminUser };
-      req.session.prefs = savedPrefs || {};
+      req.session.user = { username: adminUser };
       req.session.save(function() { res.redirect('/'); });
     });
   });
 });
 
 router.post('/logout', function(req, res) {
-  var savedPrefs = req.session.prefs;  // keep prefs across logout
-  req.session.regenerate(function() {
-    req.session.prefs = savedPrefs || {};
-    req.session.save(function() { res.redirect('/login'); });
-  });
+  req.session.destroy(function() { res.redirect('/login'); });
 });
 
 module.exports = router;
