@@ -64,7 +64,13 @@
             ? formatDate(node.expiry) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
-          const tags     = node.tags || [];
+          const pak      = node.preAuthKey || null;
+          const pakTags  = (pak && pak.aclTags) || [];
+          const nodeTags = node.tags || [];
+          // Merge node-level tags with preAuthKey aclTags, deduplicated
+          const tagSet   = {};
+          nodeTags.concat(pakTags).forEach(function(t) { tagSet[t] = true; });
+          const tags     = Object.keys(tagSet);
         %>
         <tr data-status="<%= online ? 'online' : 'offline' %>" class="<%= !online ? 'row-muted' : '' %>">
           <td><code><%= node.id %></code></td>
@@ -115,7 +121,6 @@
             <% } %>
           </td>
           <td>
-            <% var pak = node.preAuthKey; %>
             <% if (pak && pak.key) { %>
             <a href="/preauth?user=<%= encodeURIComponent(userName) %>" class="key-count-badge" title="<%= pak.key %>">
               <%= pak.key.substring(0, 8) %>…
