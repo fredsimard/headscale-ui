@@ -231,9 +231,9 @@ var themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
   themeToggle.addEventListener('click', function() {
     var html = document.documentElement;
-    var isDark = html.getAttribute('data-theme') === 'dark';
+    var isDark = html.getAttribute('data-bs-theme') === 'dark';
     var newTheme = isDark ? 'light' : 'dark';
-    html.setAttribute('data-theme', newTheme);
+    html.setAttribute('data-bs-theme', newTheme);
     themeToggle.querySelector('i').className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
     fetch('/prefs/theme', {
       method: 'POST',

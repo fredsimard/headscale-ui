@@ -15,7 +15,7 @@
 }
 
 /* === Dark mode tokens === */
-[data-theme="dark"] {
+[data-bs-theme="dark"] {
   --canvas:          #111111;
   --surface-soft:    #1c1c1c;
   --surface-dark:    #f5f5f5;
@@ -30,19 +30,19 @@
   --on-dark:         #111111;
 }
 
-[data-theme="dark"] .navbar-toggler-icon {
+[data-bs-theme="dark"] .navbar-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-[data-theme="dark"] .modal-content {
+[data-bs-theme="dark"] .modal-content {
   background-color: var(--canvas);
 }
 
-[data-theme="dark"] .modal-backdrop {
+[data-bs-theme="dark"] .modal-backdrop {
   --bs-backdrop-bg: #000;
 }
 
-[data-theme="dark"] .form-check-input {
+[data-bs-theme="dark"] .form-check-input {
   background-color: var(--surface-soft);
   border-color: var(--hairline-strong);
 }
