@@ -33,4 +33,14 @@ router.post('/', function(req, res) {
   res.redirect('/prefs?success=' + encodeURIComponent('Preferences saved.'));
 });
 
+// AJAX theme toggle — called by the dark mode button without a page reload
+router.post('/theme', function(req, res) {
+  if (!req.session.prefs) req.session.prefs = {};
+  var theme = req.body.theme;
+  if (theme === 'dark' || theme === 'light') {
+    req.session.prefs.theme = theme;
+  }
+  res.json({ ok: true, theme: req.session.prefs.theme });
+});
+
 module.exports = router;

@@ -94,9 +94,10 @@ app.use(function locals(req, res, next) {
   var style = DATE_STYLES[prefs.dateFormat] || DATE_STYLES.medium;
   var opts  = Object.assign({}, style, { hour12: prefs.timeFormat !== '24h', timeZone: tz });
 
-  res.locals.path = req.path;
-  res.locals.user = req.session.user || null;
-  res.locals.tz   = tz;
+  res.locals.path  = req.path;
+  res.locals.user  = req.session.user || null;
+  res.locals.tz    = tz;
+  res.locals.theme = prefs.theme || 'light';
 
   res.locals.formatDate = function(val) {
     if (!val) return '—';

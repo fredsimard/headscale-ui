@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<%= locals.theme || 'light' %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,9 @@
         </li>
       </ul>
       <div class="d-flex align-items-center gap-2">
+        <button id="themeToggle" class="btn btn-outline-light btn-sm" title="Toggle dark mode">
+          <i class="<%= (locals.theme === 'dark') ? 'bi bi-sun' : 'bi bi-moon' %>"></i>
+        </button>
         <a class="nav-link <%= path === '/prefs' ? 'active' : '' %>" href="/prefs" title="Preferences">
           <i class="bi bi-sliders me-1"></i>Preferences
         </a>

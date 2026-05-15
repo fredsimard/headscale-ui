@@ -226,6 +226,23 @@ document.querySelectorAll('.search-box').forEach(function(input) {
   });
 });
 
+// Dark mode toggle
+var themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    var isDark = html.getAttribute('data-theme') === 'dark';
+    var newTheme = isDark ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    themeToggle.querySelector('i').className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+    fetch('/prefs/theme', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ theme: newTheme }),
+    });
+  });
+}
+
 // Preferences — radio card visual selection
 document.querySelectorAll('.pref-radio-card input[type="radio"]').forEach(function(input) {
   input.addEventListener('change', function() {

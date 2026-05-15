@@ -14,6 +14,39 @@
   --on-dark:         #ffffff;
 }
 
+/* === Dark mode tokens === */
+[data-theme="dark"] {
+  --canvas:          #111111;
+  --surface-soft:    #1c1c1c;
+  --surface-dark:    #f5f5f5;
+  --hairline:        #2a2a2a;
+  --hairline-strong: #3d3d3d;
+  --ink:             #f5f5f5;
+  --charcoal:        #d4d4d4;
+  --body-text:       #a3a3a3;
+  --mute:            #6b6b6b;
+  --primary:         #f5f5f5;
+  --ink-deep:        #ffffff;
+  --on-dark:         #111111;
+}
+
+[data-theme="dark"] .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-theme="dark"] .modal-content {
+  background-color: var(--canvas);
+}
+
+[data-theme="dark"] .modal-backdrop {
+  --bs-backdrop-bg: #000;
+}
+
+[data-theme="dark"] .form-check-input {
+  background-color: var(--surface-soft);
+  border-color: var(--hairline-strong);
+}
+
 /* === Base === */
 *,
 *::before,
