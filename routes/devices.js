@@ -5,6 +5,16 @@ var router = express.Router();
 
 router.get('/', function(req, res) {
   api.listNodes(function(nodeErr, nodes) {
+    if (nodes && nodes.length > 0) {
+      console.log('[DEBUG] First node keys:', Object.keys(nodes[0]));
+      console.log('[DEBUG] First node tags:', JSON.stringify({
+        forcedTags:  nodes[0].forcedTags,
+        forced_tags: nodes[0].forced_tags,
+        validTags:   nodes[0].validTags,
+        valid_tags:  nodes[0].valid_tags,
+        tags:        nodes[0].tags,
+      }));
+    }
     api.listUsers(function(userErr, users) {
       var error = nodeErr ? nodeErr.message : (userErr ? userErr.message : (req.query.error || null));
       res.render('devices', {

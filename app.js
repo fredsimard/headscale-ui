@@ -106,7 +106,12 @@ app.use(function locals(req, res, next) {
     return d.toLocaleString(undefined, opts);
   };
 
-  next();
+  // Fetch policy status for the footer badge — only when logged in
+  if (!req.session || !req.session.user) return next();
+  api.getPolicy(function(err, data) {
+    res.locals.policyActive = !err && data && typeof data.policy === 'string' && data.policy.trim().length > 0;
+    next();
+  });
 });
 
 app.use('/', authRoutes);

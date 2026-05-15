@@ -55,7 +55,9 @@
             ? formatDate(node.expiry) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
-          const tags     = Array.from(new Set((node.forcedTags || []).concat(node.validTags || [])));
+          const tags     = Array.from(new Set(
+            (node.forcedTags || node.forced_tags || []).concat(node.validTags || node.valid_tags || [])
+          ));
         %>
         <tr data-status="<%= online ? 'online' : 'offline' %>" class="<%= !online ? 'row-muted' : '' %>">
           <td><code><%= node.id %></code></td>
