@@ -711,6 +711,18 @@ code {
   color: var(--mute);
 }
 
+/* === Table cross-links === */
+.table-link {
+  color: inherit;
+  text-decoration: none;
+}
+.table-link:hover {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--mute);
+  color: inherit;
+}
+
 /* === Search box === */
 .search-box-wrapper {
   position: relative;

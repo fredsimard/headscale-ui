@@ -45,7 +45,7 @@
         <% users.forEach(u => { %>
         <tr>
           <td><code><%= u.id %></code></td>
-          <td style="font-weight: 500; color: var(--ink)"><%= u.name %></td>
+          <td style="font-weight: 500; color: var(--ink)"><a href="/devices?search=<%= encodeURIComponent(u.name) %>" class="table-link" style="font-weight: 500; color: var(--ink)"><%= u.name %></a></td>
           <td style="color: var(--body-text)"><%= u.displayName || '—' %></td>
           <td style="color: var(--body-text)"><%= u.email || '—' %></td>
           <td style="font-size: 13px; color: var(--body-text)" data-value="<%= u.createdAt || '' %>">

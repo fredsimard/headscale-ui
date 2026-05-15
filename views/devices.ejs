@@ -69,7 +69,7 @@
           <td><code><%= node.id %></code></td>
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
-          <td><%= userName %></td>
+          <td><% if (userName !== '—') { %><a href="/users?search=<%= encodeURIComponent(userName) %>" class="table-link"><%= userName %></a><% } else { %>—<% } %></td>
           <td>
             <% if (tags.length > 0) { %>
             <div class="tag-list">
