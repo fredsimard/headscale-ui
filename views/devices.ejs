@@ -26,6 +26,7 @@
           <th>Hostname</th>
           <th>Machine name</th>
           <th>User</th>
+          <th>Tags</th>
           <th>IP addresses</th>
           <th>Ephemeral</th>
           <th>Last seen</th>
@@ -37,7 +38,7 @@
       <tbody>
         <% if (nodes.length === 0) { %>
         <tr>
-          <td colspan="10">
+          <td colspan="11">
             <div class="empty-state">
               <i class="bi bi-pc-display d-block mb-2" style="font-size: 24px;"></i>
               No devices registered yet.
@@ -54,12 +55,24 @@
             ? formatDate(node.expiry) : 'Never';
           const ips      = node.ipAddresses ? node.ipAddresses.join(', ') : '—';
           const userName = node.user ? (node.user.name || node.user.displayName || '—') : '—';
+          const tags     = node.forcedTags && node.forcedTags.length > 0 ? node.forcedTags : [];
         %>
         <tr data-status="<%= online ? 'online' : 'offline' %>" class="<%= !online ? 'row-muted' : '' %>">
           <td><code><%= node.id %></code></td>
           <td style="font-weight: 500; color: var(--ink)"><%= node.givenName || node.name || '—' %></td>
           <td style="color: var(--mute); font-size: 13px"><%= node.name || '—' %></td>
           <td><%= userName %></td>
+          <td>
+            <% if (tags.length > 0) { %>
+            <div class="tag-list">
+              <% tags.forEach(function(tag) { %>
+              <span class="tag-pill"><%= tag %></span>
+              <% }) %>
+            </div>
+            <% } else { %>
+            <span style="color: var(--mute)">—</span>
+            <% } %>
+          </td>
           <td>
             <div class="ip-list">
               <% (node.ipAddresses || []).forEach(function(ip) { %>

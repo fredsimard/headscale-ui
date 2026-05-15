@@ -131,3 +131,11 @@ exports.createPreAuthKey = function(userId, opts, callback) {
 exports.expirePreAuthKey = function(user, key, callback) {
   apiRequest('POST', '/preauthkey/expire', { user: user, key: key }, callback);
 };
+
+// Policy
+exports.getPolicy = function(callback) {
+  apiRequest('GET', '/policy', null, function(err, data) {
+    if (err) return callback(err);
+    callback(null, data || {});
+  });
+};
