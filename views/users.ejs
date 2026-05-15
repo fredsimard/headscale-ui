@@ -28,13 +28,14 @@
           <th>Display name</th>
           <th>Email</th>
           <th>Created</th>
+          <th>Keys</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <% if (users.length === 0) { %>
         <tr>
-          <td colspan="6">
+          <td colspan="7">
             <div class="empty-state">
               <i class="bi bi-people d-block mb-2" style="font-size: 24px;"></i>
               No users found.
@@ -50,6 +51,14 @@
           <td style="color: var(--body-text)"><%= u.email || '—' %></td>
           <td style="font-size: 13px; color: var(--body-text)" data-value="<%= u.createdAt || '' %>">
             <%= formatDate(u.createdAt) %>
+          </td>
+          <td>
+            <% var keyCount = keyCounts[u.name] || 0; %>
+            <% if (keyCount > 0) { %>
+            <a href="/preauth?user=<%= encodeURIComponent(u.name) %>" class="key-count-badge"><%= keyCount %></a>
+            <% } else { %>
+            <span style="color: var(--mute); font-size: 13px">—</span>
+            <% } %>
           </td>
           <td>
             <div class="d-flex gap-2">
