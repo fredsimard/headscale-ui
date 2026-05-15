@@ -1,14 +1,3 @@
-// Auto-fill search box from ?search= URL parameter and trigger filtering
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var q = params.get('search');
-  if (!q) return;
-  var input = document.querySelector('.search-box');
-  if (!input) return;
-  input.value = q;
-  input.dispatchEvent(new Event('input'));
-})();
-
 // Clipboard helper — works over plain HTTP and HTTPS
 function copyText(text) {
   if (navigator.clipboard && window.isSecureContext) {
@@ -263,3 +252,15 @@ document.querySelectorAll('.pref-radio-card input[type="radio"]').forEach(functi
     });
   });
 });
+
+// Auto-fill search box from ?search= URL parameter — must run last so all
+// event listeners above are already registered before dispatchEvent fires
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var q = params.get('search');
+  if (!q) return;
+  var input = document.querySelector('.search-box');
+  if (!input) return;
+  input.value = q;
+  input.dispatchEvent(new Event('input'));
+})();
