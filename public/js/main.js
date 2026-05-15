@@ -31,20 +31,56 @@ document.querySelectorAll('.ip-pill').forEach(function(pill) {
   });
 });
 
-// Device status filter
+// Device status filter — works with search
+var currentStatusFilter = 'all';
+
+function applyDeviceFilters() {
+  var searchInput = document.getElementById('deviceSearch');
+  var query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  var table = document.getElementById('devicesTable');
+  if (!table) return;
+
+  table.querySelectorAll('tbody tr').forEach(function(row) {
+    if (row.querySelector('td[colspan]')) {
+      row.style.display = (!query && currentStatusFilter === 'all') ? '' : 'none';
+      return;
+    }
+    // Status filter
+    var statusMatch = currentStatusFilter === 'all' || row.dataset.status === currentStatusFilter;
+    // Search filter
+    var searchMatch = true;
+    if (query) {
+      var haystack = '';
+      row.querySelectorAll('td').forEach(function(cell) {
+        haystack += ' ' + cell.textContent;
+        if (cell.dataset.value) haystack += ' ' + cell.dataset.value;
+        cell.querySelectorAll('[data-ip]').forEach(function(el) {
+          haystack += ' ' + el.dataset.ip;
+        });
+      });
+      searchMatch = haystack.toLowerCase().indexOf(query) !== -1;
+    }
+    row.style.display = (statusMatch && searchMatch) ? '' : 'none';
+  });
+}
+
 document.querySelectorAll('.status-filter').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    var filter = btn.dataset.filter;
+    currentStatusFilter = btn.dataset.filter;
     document.querySelectorAll('.status-filter').forEach(function(b) {
       b.classList.toggle('active',      b === btn);
       b.classList.toggle('btn-primary', b === btn);
       b.classList.toggle('btn-secondary', b !== btn);
     });
-    document.querySelectorAll('tbody tr[data-status]').forEach(function(row) {
-      row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
-    });
+    applyDeviceFilters();
   });
 });
+
+// Hook device search into combined filter
+var deviceSearchInput = document.getElementById('deviceSearch');
+if (deviceSearchInput) {
+  deviceSearchInput.addEventListener('input', applyDeviceFilters);
+}
 
 // Devices — rename modal
 var renameModal = document.getElementById('renameModal');
@@ -150,6 +186,42 @@ document.querySelectorAll('table[data-sortable]').forEach(function(table) {
       });
 
       rows.forEach(function(row) { tbody.appendChild(row); });
+    });
+  });
+});
+
+// Table search — real-time filtering across all visible columns
+// (skips devicesTable which has its own combined filter with status)
+document.querySelectorAll('.search-box').forEach(function(input) {
+  var tableId = input.dataset.table;
+  if (tableId === 'devicesTable') return;  // handled by applyDeviceFilters
+  var table = document.getElementById(tableId);
+  if (!table) return;
+
+  input.addEventListener('input', function() {
+    var query = input.value.toLowerCase().trim();
+    var rows = table.querySelectorAll('tbody tr');
+
+    rows.forEach(function(row) {
+      if (row.querySelector('td[colspan]')) {
+        row.style.display = query ? 'none' : '';
+        return;
+      }
+      if (!query) {
+        row.style.display = '';
+        return;
+      }
+      var cells = row.querySelectorAll('td');
+      var haystack = '';
+      cells.forEach(function(cell) {
+        haystack += ' ' + cell.textContent;
+        if (cell.dataset.value) haystack += ' ' + cell.dataset.value;
+        cell.querySelectorAll('[data-ip]').forEach(function(el) {
+          haystack += ' ' + el.dataset.ip;
+        });
+      });
+      haystack = haystack.toLowerCase();
+      row.style.display = haystack.indexOf(query) !== -1 ? '' : 'none';
     });
   });
 });

@@ -9,12 +9,13 @@ var DATE_FORMATS = ['long', 'medium', 'short', 'relative'];
 router.get('/', function(req, res) {
   var prefs = req.session.prefs || {};
   res.render('prefs', {
-    title:       'Preferences',
-    serverTz:    SERVER_TZ,
-    allTimezones: ALL_TZ,
-    currentTz:   prefs.timezone   || SERVER_TZ,
-    timeFormat:  prefs.timeFormat || '12h',
-    dateFormat:  prefs.dateFormat || 'medium',
+    title:          'Preferences',
+    serverTz:       SERVER_TZ,
+    allTimezones:   ALL_TZ,
+    currentTz:      prefs.timezone      || SERVER_TZ,
+    timeFormat:     prefs.timeFormat    || '12h',
+    dateFormat:     prefs.dateFormat    || 'medium',
+    headscaleFqdn:  prefs.headscaleFqdn || '',
     success: req.query.success || null,
     error:   null,
   });
@@ -26,6 +27,9 @@ router.post('/', function(req, res) {
   if (tz && ALL_TZ.includes(tz))                    req.session.prefs.timezone   = tz;
   if (TIME_FORMATS.includes(req.body.timeFormat))   req.session.prefs.timeFormat = req.body.timeFormat;
   if (DATE_FORMATS.includes(req.body.dateFormat))   req.session.prefs.dateFormat = req.body.dateFormat;
+  // Headscale public FQDN (trim whitespace, accept empty to clear)
+  var fqdn = (req.body.headscaleFqdn || '').trim();
+  req.session.prefs.headscaleFqdn = fqdn;
   res.redirect('/prefs?success=' + encodeURIComponent('Preferences saved.'));
 });
 

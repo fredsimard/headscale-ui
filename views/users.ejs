@@ -10,9 +10,17 @@
   </button>
 </div>
 
+<div class="d-flex justify-content-center mb-4">
+  <div class="search-box-wrapper">
+    <i class="bi bi-search search-box-icon"></i>
+    <input type="text" class="form-control search-box" id="userSearch"
+      placeholder="Search users…" data-table="usersTable">
+  </div>
+</div>
+
 <div class="card">
   <div class="table-responsive">
-    <table class="table table-hover mb-0" data-sortable>
+    <table class="table table-hover mb-0" data-sortable id="usersTable">
       <thead>
         <tr>
           <th>ID</th>
