@@ -64,24 +64,32 @@ Paste the output into `ADMIN_PASSWORD_HASH` in your `.env` file.
 
 ### 5. Merge the docker-compose.yml
 
-Add the `headscale-ui` service from `headscale-ui/docker-compose.yml` into your existing `docker-compose.yml`. Make sure to use `ports` (not `expose`) so the UI is accessible from the host:
+Add the `headscale-ui` service from `headscale-ui/docker-compose.yml` into your existing `docker-compose.yml`. Make sure to use `ports` (not `expose`) so the UI is accessible from the host, and include the named volume so preferences persist across rebuilds:
 
 ```yaml
-headscale-ui:
-  build:
-    context: ./headscale-ui
-    dockerfile: Dockerfile
-  container_name: headscale-ui
-  restart: unless-stopped
-  env_file: .env
-  environment:
-    - NODE_ENV=production
-    - TRUST_PROXY=true
-  depends_on:
-    - headscale
-  ports:
-    - "3000:3000"
+services:
+  headscale-ui:
+    build:
+      context: ./headscale-ui
+      dockerfile: Dockerfile
+    container_name: headscale-ui
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - TRUST_PROXY=true
+    volumes:
+      - headscale_ui_data:/app/data
+    depends_on:
+      - headscale
+    ports:
+      - "3000:3000"
+
+volumes:
+  headscale_ui_data:
 ```
+
+> **Note:** The `headscale_ui_data` volume stores user preferences (timezone, date format, theme, etc.) on disk. Without it, preferences reset every time the container is rebuilt.
 
 ### 6. Configure reverse proxy (optional)
 
@@ -122,5 +130,5 @@ graph LR
 - The UI runs as a separate Docker container — Headscale is unaware of its existence
 - All Headscale API calls are made server-side using the API key
 - Authentication is handled entirely by the UI app, independent of Headscale
-- Session data is stored in-memory (restarts clear sessions)
+- Session data (login) is in-memory — restarts require re-login, but preferences persist on disk via the `headscale_ui_data` volume
 - Both containers must be on the same Docker network for internal communication
