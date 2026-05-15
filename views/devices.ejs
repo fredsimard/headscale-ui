@@ -40,13 +40,14 @@
           <th>Last seen</th>
           <th>Expiry</th>
           <th>Status</th>
+          <th>Pre-Auth Key</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <% if (nodes.length === 0) { %>
         <tr>
-          <td colspan="11">
+          <td colspan="12">
             <div class="empty-state">
               <i class="bi bi-pc-display d-block mb-2" style="font-size: 24px;"></i>
               No devices registered yet.
@@ -111,6 +112,16 @@
             <span class="badge bg-success">Online</span>
             <% } else { %>
             <span class="badge bg-secondary">Offline</span>
+            <% } %>
+          </td>
+          <td>
+            <% var pak = node.preAuthKey; %>
+            <% if (pak && pak.key) { %>
+            <a href="/preauth?user=<%= encodeURIComponent(userName) %>" class="key-count-badge" title="<%= pak.key %>">
+              <%= pak.key.substring(0, 8) %>…
+            </a>
+            <% } else { %>
+            <span style="color: var(--mute)">—</span>
             <% } %>
           </td>
           <td>

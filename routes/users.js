@@ -5,33 +5,11 @@ var router = express.Router();
 
 router.get('/', function(req, res) {
   api.listUsers(function(err, users) {
-    if (err || !users || users.length === 0) {
-      return res.render('users', {
-        title: 'Users',
-        users: users || [],
-        keyCounts: {},
-        error: err ? err.message : (req.query.error || null),
-        success: req.query.success || null,
-      });
-    }
-
-    // Fetch pre-auth key counts for all users in parallel
-    var keyCounts = {};
-    var pending = users.length;
-
-    users.forEach(function(u) {
-      api.listPreAuthKeys(u.name, function(keyErr, keys) {
-        keyCounts[u.name] = keyErr ? 0 : (keys || []).length;
-        if (--pending === 0) {
-          res.render('users', {
-            title: 'Users',
-            users: users,
-            keyCounts: keyCounts,
-            error: req.query.error || null,
-            success: req.query.success || null,
-          });
-        }
-      });
+    res.render('users', {
+      title: 'Users',
+      users: users || [],
+      error: err ? err.message : (req.query.error || null),
+      success: req.query.success || null,
     });
   });
 });
