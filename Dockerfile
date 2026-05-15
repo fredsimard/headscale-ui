@@ -7,6 +7,8 @@ RUN npm ci --omit=dev
 
 COPY . .
 
+RUN mkdir -p /app/data && chown node:node /app/data
+
 EXPOSE 3000
 
 USER node
