@@ -711,6 +711,27 @@ code {
   color: var(--mute);
 }
 
+/* === Search box === */
+.search-box-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+}
+
+.search-box-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mute);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-box {
+  padding-left: 38px !important;
+}
+
 /* === Empty state === */
 .empty-state {
   text-align: center;
